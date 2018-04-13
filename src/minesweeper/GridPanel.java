@@ -1,7 +1,8 @@
 package minesweeper;
 
-import javax.swing.JPanel;
-import java.awt.*;
+import javax.swing.*;
+import java.awt.Button;
+import java.awt.GridLayout;
 
 
 // INTEGRATING EVENTS INTO THE GAMEBOARD CLASS
@@ -9,6 +10,12 @@ import java.awt.*;
 public class GridPanel extends JPanel {
     public GridPanel() {
         setLayout(new GridLayout(1, 1));
+        setBorder(BorderFactory.createRaisedBevelBorder());
+
+        // Adjust components
+        button.setFocusable(false);
+
+        // Add components
         add(button);
     }
 
@@ -16,21 +23,10 @@ public class GridPanel extends JPanel {
         return button;
     }
 
-    // MIGHT NOT USE THIS FUNCTIONALITY
-    public int getNearbyBombs() {
+    public JLabel getNearbyBombs() {
         return nearbyBombs;
     }
 
-    public void setNearbyBombs(int bombs) {
-        nearbyBombs = bombs;
-    }
-
-    public void incrementNearbyBombs() {
-        nearbyBombs++;
-    }
-
-    // MIGHT NOT USE
-
     private Button button = new Button();
-    private int nearbyBombs;
+    private JLabel nearbyBombs = new JLabel("1");
 }

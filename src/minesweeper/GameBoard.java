@@ -1,6 +1,6 @@
 package minesweeper;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,6 +23,7 @@ public class GameBoard extends JPanel {
         initGrid();
         initNumGrid();
 
+        this.setPreferredSize(new Dimension(300, 300));
         // Print the numGrid
         numGrid.forEach((rowList) -> {
             rowList.forEach((colItem) -> {
@@ -45,13 +46,13 @@ public class GameBoard extends JPanel {
             }
         }
 
-        // Create mouse listeners for each buttonS
+        // Create mouse listeners for each button
         grid.forEach((colList) -> {
             colList.forEach((gridPanel) -> {
                 gridPanel.getButton().addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        gridBtnClicked(e, gridPanel.getButton());
+                        gridBtnClicked(e, gridPanel);
                     }
                 });
             });
@@ -86,11 +87,14 @@ public class GameBoard extends JPanel {
         }
     }
 
-    private void gridBtnClicked(MouseEvent e, Button button) {
-        // UPDATE THIS
+    private void gridBtnClicked(MouseEvent e, GridPanel gridPanel) {
+        // Remove the button
+        gridPanel.remove(gridPanel.getButton());
+        gridPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 
-        button.setEnabled(false);
-        button.setVisible(false);
+        // Add the Label NOT WORKING
+        gridPanel.add(gridPanel.getNearbyBombs());
+
     }
 
     private final int ROWS;
