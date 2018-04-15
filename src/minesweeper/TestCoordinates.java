@@ -4,8 +4,6 @@ import java.util.List;
 import java.awt.Point;
 import java.util.Stack;
 
-// BOUND CASES STILL ARE THROWING OUT OF RANGE EXCEPTIONS
-
 public class TestCoordinates {
 
     public TestCoordinates(int maxrows, int maxcols, List<List<Integer>> numGrid) {
@@ -111,7 +109,7 @@ public class TestCoordinates {
     }
 
     private void testSouth(Point p) {
-        if (p.x < MAXCOLS) {
+        if (p.x < MAXROWS) {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }

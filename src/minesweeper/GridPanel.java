@@ -8,14 +8,16 @@ import java.awt.*;
 
 public class GridPanel extends JPanel {
     public GridPanel() {
-        setLayout(new GridLayout(1, 1));
+        setLayout(new BorderLayout());
         setBorder(BorderFactory.createRaisedBevelBorder());
+        setPreferredSize(new Dimension(25, 25));
 
         // Adjust components
         button.setFocusable(false);
 
         // Add components
-        add(button);
+        add(button, BorderLayout.CENTER);
+
     }
 
     public Button getButton() {
@@ -70,15 +72,23 @@ public class GridPanel extends JPanel {
         }
     }
 
-    public void gridBtnRightClicked() {
+    public int gridBtnRightClicked() {
+        int result = 0;
         // Mark the panel as a bomb
         if(!button.getBackground().equals(Color.RED)) {
             button.setBackground(Color.RED);
+            if (nearbyBombs.getText().equals("-1")) {
+                result = 1;
+            }
         }
         else {
+            if (nearbyBombs.getText().equals("-1")) {
+                result = -1;
+            }
             button.setBackground(UIManager.getColor("Button.background"));
         }
 
+        return result;
     }
 
     private Button button = new Button();

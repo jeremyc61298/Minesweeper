@@ -10,10 +10,23 @@ import java.util.Random;
 
 public class GameBoard extends JPanel {
 
-    public GameBoard(int rows, int cols) {
-        this.ROWS = rows;
-        this.COLS = cols;
-        this.BOMBS = 10;
+    public GameBoard(int difficulty) {
+        switch (difficulty) {
+            case 2:
+                ROWS = 20;
+                COLS = 20;
+                BOMBS = 50;
+                break;
+            case 3:
+                ROWS = 20;
+                COLS = 30;
+                BOMBS = 100;
+                break;
+            default:
+                ROWS = 10;
+                COLS = 10;
+                BOMBS = 10;
+        }
         setLayout(new GridLayout(ROWS, COLS));
         initGameBoard();
     }
@@ -21,9 +34,6 @@ public class GameBoard extends JPanel {
     private void initGameBoard() {
 
         initGrid();
-
-        this.setPreferredSize(new Dimension(300, 300));
-
         printNumGrid();
     }
 
@@ -41,31 +51,10 @@ public class GameBoard extends JPanel {
             }
         }
 
-        // Create mouse listeners for each button
-        grid.forEach((colList) -> {
-            colList.forEach((gridPanel) -> {
-                gridPanel.getButton().addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            gridPanel.gridBtnLeftClicked();
-
-                            if (gridPanel.getNearbyBombs().getText().equals("0")) {
-                                TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
-                                tc.testForZeros(gridPanel);
-                                printNumGrid();
-                            }
-                        }
-                        else if (e.getButton() == MouseEvent.BUTTON3){
-                            gridPanel.gridBtnRightClicked();
-                        }
-                    }
-                });
-            });
-        });
-
+        createClickListeners();
         initNumGrid();
 
+        // Set nearbyBombs in each gridPanel
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
                 String num = numGrid.get(i).get(j).toString();
@@ -95,6 +84,7 @@ public class GameBoard extends JPanel {
                 randCols = rand.nextInt(COLS - 1);
             }
             numGrid.get(randRow).set(randCols, -1);
+            bombLocations.add(new Point(randRow, randCols));
         }
 
         // Fill in the gaps
@@ -108,6 +98,61 @@ public class GameBoard extends JPanel {
         }
     }
 
+    private void createClickListeners() {
+        // Create mouse listeners for each button
+        grid.forEach((colList) -> {
+            colList.forEach((gridPanel) -> {
+                gridPanel.getButton().addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            gridPanel.gridBtnLeftClicked();
+
+                            if (gridPanel.getNearbyBombs().getText().equals("0")) {
+                                TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
+                                tc.testForZeros(gridPanel);
+                            }
+                            else if (gridPanel.getNearbyBombs().getText().equals("-1")) {
+                                endGame(false);
+                            }
+                        }
+                        else if (e.getButton() == MouseEvent.BUTTON3){
+                            bombsFound += gridPanel.gridBtnRightClicked();
+                            if (bombsFound == BOMBS) {
+                                endGame(true);
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    private void endGame(boolean didWin) {
+        // The user has finished the game.
+        // Disable the gameBoard
+        disableGameBoard(this);
+
+        if (!didWin) {
+            revealBombs();
+        }
+    }
+
+    private void disableGameBoard(Container container) {
+        Component[] components = container.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                components[i].setEnabled(false);
+                if (components[i] instanceof  Container) {
+                    disableGameBoard((Container)components[i]);
+                }
+        }
+    }
+
+    private void revealBombs() {
+        bombLocations.forEach(point -> {
+           grid.get(point.x).get(point.y).gridBtnLeftClicked();
+        });
+    }
 
     private void printNumGrid() {
         // Print the numGrid
@@ -122,6 +167,8 @@ public class GameBoard extends JPanel {
     private final int ROWS;
     private final int COLS;
     private final int BOMBS;
+    private int bombsFound = 0;
+    private List<Point> bombLocations = new ArrayList<>();
     private List<List<GridPanel>> grid = new ArrayList<>();
     private List<List<Integer>> numGrid = new ArrayList<>();
 }

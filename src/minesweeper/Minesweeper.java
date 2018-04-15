@@ -1,7 +1,7 @@
 package minesweeper;
 
 import javax.swing.JFrame;
-import java.awt.FlowLayout;
+import java.awt.*;
 
 
 public class Minesweeper extends JFrame {
@@ -13,7 +13,11 @@ public class Minesweeper extends JFrame {
     private void initUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
-        setSize(500, 500);
+        // OPEN FULLSCREEN?
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize.width, screenSize.height);
+
+
         // Add components...
         setMenuBar(menuBar);
         add(gameboard);
@@ -24,7 +28,7 @@ public class Minesweeper extends JFrame {
     }
 
     private MineMenuBar menuBar = new MineMenuBar();
-    private GameBoard gameboard = new GameBoard(10, 10);
+    private GameBoard gameboard = new GameBoard(1);
 
     public static void main(String[] args) {
         Minesweeper minesweeper = new Minesweeper();
