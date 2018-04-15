@@ -21,16 +21,10 @@ public class GameBoard extends JPanel {
     private void initGameBoard() {
 
         initGrid();
-        initNumGrid();
 
         this.setPreferredSize(new Dimension(300, 300));
-        // Print the numGrid
-        numGrid.forEach((rowList) -> {
-            rowList.forEach((colItem) -> {
-                System.out.print(colItem);
-            });
-            System.out.println();
-        });
+
+        printNumGrid();
     }
 
 
@@ -41,6 +35,7 @@ public class GameBoard extends JPanel {
 
             for (int j = 0; j < COLS; j++) {
                 GridPanel newGridPanel = new GridPanel();
+                newGridPanel.setPosInGrid(new Point(i, j));
                 grid.get(i).add(newGridPanel);
                 add(newGridPanel);
             }
@@ -52,11 +47,31 @@ public class GameBoard extends JPanel {
                 gridPanel.getButton().addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        gridBtnClicked(e, gridPanel);
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            gridPanel.gridBtnLeftClicked();
+
+                            if (gridPanel.getNearbyBombs().getText().equals("0")) {
+                                TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
+                                tc.testForZeros(gridPanel);
+                                printNumGrid();
+                            }
+                        }
+                        else if (e.getButton() == MouseEvent.BUTTON3){
+                            gridPanel.gridBtnRightClicked();
+                        }
                     }
                 });
             });
         });
+
+        initNumGrid();
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                String num = numGrid.get(i).get(j).toString();
+                grid.get(i).get(j).setNearbyBombs(num);
+            }
+        }
     }
 
     private void initNumGrid() {
@@ -71,9 +86,14 @@ public class GameBoard extends JPanel {
 
         // Place bombs
         Random rand = new Random();
+        int randRow = rand.nextInt(ROWS - 1);
+        int randCols = rand.nextInt(COLS - 1);
+
         for (int i = 0; i < BOMBS; i++) {
-            int randRow = rand.nextInt(ROWS);
-            int randCols = rand.nextInt(COLS);
+            while (numGrid.get(randRow).get(randCols) == -1) {
+                randRow = rand.nextInt(ROWS - 1);
+                randCols = rand.nextInt(COLS - 1);
+            }
             numGrid.get(randRow).set(randCols, -1);
         }
 
@@ -81,25 +101,27 @@ public class GameBoard extends JPanel {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
                 if (numGrid.get(i).get(j).equals(-1)) {
-                    TestCoordinates tc = new TestCoordinates(i, j, ROWS, COLS, numGrid);
+                    TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid);
+                    tc.testAll(i, j);
                 }
             }
         }
     }
 
-    private void gridBtnClicked(MouseEvent e, GridPanel gridPanel) {
-        // Remove the button
-        gridPanel.remove(gridPanel.getButton());
-        gridPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 
-        // Add the Label NOT WORKING
-        gridPanel.add(gridPanel.getNearbyBombs());
-
+    private void printNumGrid() {
+        // Print the numGrid
+        numGrid.forEach((rowList) -> {
+            rowList.forEach((colItem) -> {
+                System.out.print(colItem);
+            });
+            System.out.println();
+        });
     }
 
     private final int ROWS;
     private final int COLS;
     private final int BOMBS;
-    private List<List<GridPanel>> grid = new ArrayList<List<GridPanel>>();
-    private List<List<Integer>> numGrid = new ArrayList<List<Integer>>();
+    private List<List<GridPanel>> grid = new ArrayList<>();
+    private List<List<Integer>> numGrid = new ArrayList<>();
 }
