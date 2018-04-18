@@ -55,7 +55,7 @@ public class TestCoordinates {
 
             // This if statement will hopefully stop some overhead when
             // a button has already been disabled
-            if ( grid.get(p.x).get(p.y).getButton().isEnabled()) {
+            if ( grid.get(p.x).get(p.y).isEnabled()) {
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
             p = possibleMoves.pop();
@@ -75,7 +75,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -94,7 +94,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -113,7 +113,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -132,7 +132,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -153,7 +153,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -174,7 +174,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -195,7 +195,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }
@@ -216,7 +216,7 @@ public class TestCoordinates {
             if (numGrid.get(p.x).get(p.y) == 0) {
                 possibleMoves.push(p);
             }
-            else if (grid.get(p.x).get(p.y).getButton().isEnabled()){
+            else if (grid.get(p.x).get(p.y).isEnabled()){
                 grid.get(p.x).get(p.y).gridBtnLeftClicked();
             }
         }

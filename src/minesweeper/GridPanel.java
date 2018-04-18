@@ -1,35 +1,34 @@
 package minesweeper;
 
 import javax.swing.*;
+import javax.swing.ImageIcon;
+
 import java.awt.*;
+import java.awt.Point;
+import java.awt.Image;
 
-
-// INTEGRATING EVENTS INTO THE GAMEBOARD CLASS
 
 public class GridPanel extends JPanel {
     public GridPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createRaisedBevelBorder());
         setPreferredSize(new Dimension(25, 25));
-
-        // Adjust components
-        button.setFocusable(false);
-
-        // Add components
-        add(button, BorderLayout.CENTER);
-
+        bomb = new ImageIcon(new ImageIcon("Images/mine.png").getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT));
     }
 
-    public Button getButton() {
-        return button;
-    }
 
     public JLabel getNearbyBombs() {
         return nearbyBombs;
     }
 
     public void setNearbyBombs(String num) {
-        nearbyBombs.setText(num);
+       if (num.equals("-1")) {
+           nearbyBombs = new JLabel(bomb);
+           nearbyBombs.setText("");
+       }
+       else {
+           nearbyBombs.setText(num);
+       }
     }
 
     public Point getPosInGrid() {
@@ -60,38 +59,44 @@ public class GridPanel extends JPanel {
         }
     }
 
-    public void gridBtnLeftClicked() {
-        if(!button.getBackground().equals(Color.RED)){
-            // Remove the Button
-            remove(button);
+    public boolean gridBtnLeftClicked() {
+        boolean result = true;
+        if(!getBackground().equals(Color.RED)){
             setEnabled(false);
             setBorder(BorderFactory.createLoweredBevelBorder());
 
             // Add the Label
             addNearbyBombs();
+            result = false;
         }
-    }
-
-    public int gridBtnRightClicked() {
-        int result = 0;
-        // Mark the panel as a bomb
-        if(!button.getBackground().equals(Color.RED)) {
-            button.setBackground(Color.RED);
-            if (nearbyBombs.getText().equals("-1")) {
-                result = 1;
-            }
-        }
-        else {
-            if (nearbyBombs.getText().equals("-1")) {
-                result = -1;
-            }
-            button.setBackground(UIManager.getColor("Button.background"));
-        }
-
         return result;
     }
 
-    private Button button = new Button();
+    public void gridBtnRightClicked(GameBoard.Pair pair, int BOMBS) {
+
+        // Mark the panel as a bomb
+        if(!getBackground().equals(Color.RED) && pair.flags != BOMBS) {
+            setBackground(Color.RED);
+            if (nearbyBombs.getText().equals("")) {
+                pair.bombs++;
+            }
+            pair.flags++;
+        }
+        else {
+            if (nearbyBombs.getText().equals("")) {
+                pair.bombs--;
+            }
+
+            if (getBackground().equals(Color.RED)) {
+                pair.flags--;
+            }
+            setBackground(UIManager.getColor("Button.background"));
+
+        }
+    }
+
+
     private JLabel nearbyBombs = new JLabel("0", JLabel.CENTER);
     private Point posInGrid;
+    private ImageIcon bomb = null;
 }

@@ -1,12 +1,18 @@
 package minesweeper;
 
 import javax.swing.*;
+import javax.swing.ImageIcon;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 public class GameBoard extends JPanel {
 
@@ -32,16 +38,15 @@ public class GameBoard extends JPanel {
     }
 
     private void initGameBoard() {
-
         initGrid();
-        printNumGrid();
+        startTime = System.nanoTime();
     }
 
 
     private void initGrid() {
         // Fill the grid with GridButtons
         for (int i = 0; i < ROWS; i++) {
-            grid.add(new ArrayList<GridPanel>());
+            grid.add(new ArrayList<>());
 
             for (int j = 0; j < COLS; j++) {
                 GridPanel newGridPanel = new GridPanel();
@@ -66,7 +71,7 @@ public class GameBoard extends JPanel {
     private void initNumGrid() {
         // Fill the numGrid with 0's
         for (int i = 0; i < ROWS; i++) {
-            numGrid.add(new ArrayList<Integer>());
+            numGrid.add(new ArrayList<>());
 
             for (int j = 0; j < COLS; j++) {
                 numGrid.get(i).add(0);
@@ -102,24 +107,31 @@ public class GameBoard extends JPanel {
         // Create mouse listeners for each button
         grid.forEach((colList) -> {
             colList.forEach((gridPanel) -> {
-                gridPanel.getButton().addMouseListener(new MouseAdapter() {
+                gridPanel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            gridPanel.gridBtnLeftClicked();
+                        if (gridPanel.isEnabled()) {
+                            if (e.getButton() == MouseEvent.BUTTON1) {
+                                boolean isRed = gridPanel.gridBtnLeftClicked();
 
-                            if (gridPanel.getNearbyBombs().getText().equals("0")) {
-                                TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
-                                tc.testForZeros(gridPanel);
+                                if (!isRed && gridPanel.getNearbyBombs().getText().equals("0")) {
+                                    TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
+                                    tc.testForZeros(gridPanel);
+                                }
+                                else if (!isRed && gridPanel.getNearbyBombs().getText().equals("")) {
+                                    endGame();
+                                }
                             }
-                            else if (gridPanel.getNearbyBombs().getText().equals("-1")) {
-                                endGame(false);
-                            }
-                        }
-                        else if (e.getButton() == MouseEvent.BUTTON3){
-                            bombsFound += gridPanel.gridBtnRightClicked();
-                            if (bombsFound == BOMBS) {
-                                endGame(true);
+                            else if (e.getButton() == MouseEvent.BUTTON3){
+                                Pair pair = new Pair(bombsFound, flagsLaid);
+                                gridPanel.gridBtnRightClicked(pair, BOMBS);
+                                bombsFound = pair.bombs;
+                                flagsLaid = pair.flags;
+                                if (bombsFound == BOMBS) {
+                                    recordTime();
+                                    didWin = true;
+                                    endGame();
+                                }
                             }
                         }
                     }
@@ -128,17 +140,32 @@ public class GameBoard extends JPanel {
         });
     }
 
-    private void endGame(boolean didWin) {
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        addPropertyChangeListener(listener);
+    }
+
+    private void endGame() {
         // The user has finished the game.
         // Disable the gameBoard
-        disableGameBoard(this);
 
         if (!didWin) {
             revealBombs();
+            JOptionPane.showMessageDialog(null, "You lost. Nice try!",
+                    "Game Over", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("Images/mine.png"));
         }
+        else {
+            JOptionPane.showMessageDialog(null, "You won!",
+                    "Winner!", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        disableGameBoard(this);
+        setEnabled(false);
     }
 
-    private void disableGameBoard(Container container) {
+    // This recursive function was taken from the internet and modified
+    // Link:
+    public void disableGameBoard(Container container) {
         Component[] components = container.getComponents();
             for (int i = 0; i < components.length; i++) {
                 components[i].setEnabled(false);
@@ -148,10 +175,29 @@ public class GameBoard extends JPanel {
         }
     }
 
-    private void revealBombs() {
+    private void recordTime() {
+        setTotalTime((System.nanoTime() - startTime)/1000/1000/1000);
+        System.out.println(totalTime);
+    }
+
+    public void setDidWin(boolean didWin) {
+        this.didWin = didWin;
+    }
+
+    public void revealBombs() {
         bombLocations.forEach(point -> {
            grid.get(point.x).get(point.y).gridBtnLeftClicked();
         });
+    }
+
+    public void setTotalTime(long time) {
+        long oldTime = totalTime;
+        totalTime = time;
+        firePropertyChange("totalTime", oldTime, totalTime);
+    }
+
+    public long getTotalTime() {
+        return totalTime;
     }
 
     private void printNumGrid() {
@@ -164,11 +210,25 @@ public class GameBoard extends JPanel {
         });
     }
 
+    public class Pair {
+        public Pair(int bombs, int flags) {
+            this.bombs = bombs;
+            this.flags = flags;
+        }
+        public int bombs;
+        public int flags;
+    }
+
     private final int ROWS;
     private final int COLS;
     private final int BOMBS;
     private int bombsFound = 0;
+    private int flagsLaid = 0;
+    private long startTime;
+    private long totalTime = 0;
+    private boolean didWin = false;
     private List<Point> bombLocations = new ArrayList<>();
     private List<List<GridPanel>> grid = new ArrayList<>();
     private List<List<Integer>> numGrid = new ArrayList<>();
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 }
