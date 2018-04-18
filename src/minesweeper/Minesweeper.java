@@ -3,11 +3,15 @@ package minesweeper;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
-import java.io.*;
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -24,7 +28,6 @@ public class Minesweeper extends JFrame {
     private void initUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
-        // OPEN FULLSCREEN?
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize.width, screenSize.height);
         setIconImage(bomb.getImage());
@@ -35,15 +38,15 @@ public class Minesweeper extends JFrame {
         // Add components...
         setMenuBar(menuBar);
         add(gameboard);
-
-
         setVisible(true);
     }
 
     private void createMenuListeners() {
+        // Listeners which create a new gameboard and set the difficulty
         menuBar.getEasy().addActionListener((ActionEvent e) -> {
             remove(gameboard);
             gameboard = new GameBoard(1);
+            SCORES_PATH = SCORES_EASY;
             createEndGameListener();
             add(gameboard);
             repaint();
@@ -53,6 +56,7 @@ public class Minesweeper extends JFrame {
         menuBar.getMedium().addActionListener((ActionEvent e) -> {
             remove(gameboard);
             gameboard = new GameBoard(2);
+            SCORES_PATH = SCORES_MEDIUM;
             createEndGameListener();
             add(gameboard);
             repaint();
@@ -62,11 +66,13 @@ public class Minesweeper extends JFrame {
         menuBar.getHard().addActionListener((ActionEvent e) -> {
             remove(gameboard);
             gameboard = new GameBoard(3);
+            SCORES_PATH = SCORES_HARD;
             createEndGameListener();
             add(gameboard);
             repaint();
             revalidate();
         });
+        // End new gameboard listeners
 
         menuBar.getShowBombs().addActionListener((ActionEvent e) -> {
             gameboard.setDidWin(false);
@@ -77,12 +83,13 @@ public class Minesweeper extends JFrame {
         });
 
         menuBar.getViewHighScores().addActionListener((ActionEvent e) -> {
-            // SHOW THE USER THE HIGH SCORES IN A DIALOG BOX?
             try {
+                // Read in the 10 top high scores, or if less than 10, as many as there are
+                File scoreFile = new File(SCORES_PATH);
+                boolean success = scoreFile.createNewFile();
 
                 FileReader fileReader = new FileReader(SCORES_PATH);
                 BufferedReader reader = new BufferedReader(fileReader);
-
                 String line;
                 String scores = "";
                 int i = 0;
@@ -91,17 +98,25 @@ public class Minesweeper extends JFrame {
                     i++;
                 }
                 reader.close();
-                 if(scores != "") {
-                     JOptionPane.showMessageDialog(null, scores, "High Scores", JOptionPane.PLAIN_MESSAGE);
-                 }
-                 else {
-                     JOptionPane.showMessageDialog(null, "There are no high scores.", "High Scores", JOptionPane.PLAIN_MESSAGE);
-                 }
 
+                String difficulty = "Easy";
+                if (SCORES_PATH.equals(SCORES_MEDIUM)) {
+                    difficulty = "Medium";
+                }else if (SCORES_PATH.equals(SCORES_HARD)) {
+                    difficulty = "Hard";
+                }
 
+                if(scores != "") {
+                    JOptionPane.showMessageDialog(null, scores, "High Scores - " + difficulty,
+                            JOptionPane.PLAIN_MESSAGE);
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "There are no high scores.",
+                             "High Scores - " + difficulty, JOptionPane.PLAIN_MESSAGE);
+                }
             }
             catch (IOException ioe) {
-                JOptionPane.showMessageDialog(null, "You're score could not be saved.",
+                JOptionPane.showMessageDialog(null, "You're scores could not be found.",
                         "Warning", JOptionPane.WARNING_MESSAGE);
             }
 
@@ -111,6 +126,8 @@ public class Minesweeper extends JFrame {
     }
 
     private void createEndGameListener() {
+        // Property "totalTime" in gameboard is created to be a bound property, and fires
+        // an event when it is changed
         gameboard.addPropertyChangeListener("totalTime", (PropertyChangeEvent e) -> {
             // Print out to the high scores file
             System.out.println("Great!");
@@ -123,11 +140,13 @@ public class Minesweeper extends JFrame {
             File scores = new File(SCORES_PATH);
 
             try {
-                scores.createNewFile();
+                // Creates the file if it does not exist
+                boolean success = scores.createNewFile();
 
                 FileReader fileReader = new FileReader(SCORES_PATH);
                 BufferedReader reader = new BufferedReader(fileReader);
 
+                // Populates a list of a maximum of 10 scores
                 String line;
                 int i = 0;
                 while ((line = reader.readLine()) != null && i < 10) {
@@ -139,6 +158,8 @@ public class Minesweeper extends JFrame {
                 String temp = Long.toString(gameboard.getTotalTime());
                 Integer totalTime = Integer.parseInt(temp);
 
+                // Add the new score to the list if it is better than one of the 10
+                // scores from the file.
                 if(scoreList.size() == 10 && scoreList.get(scoreList.size() - 1) > totalTime) {
                     scoreList.set(scoreList.size() - 1, totalTime);
                 }
@@ -169,7 +190,10 @@ public class Minesweeper extends JFrame {
     private MineMenuBar menuBar = new MineMenuBar();
     private GameBoard gameboard = new GameBoard(1);
     private ImageIcon bomb = new ImageIcon("Images/mine.png");
-    private String SCORES_PATH = "Scores/scores.txt";
+    private String SCORES_PATH = "Scores/scoresEasy.txt";
+    private String SCORES_EASY = "Scores/scoresEasy.txt";
+    private String SCORES_MEDIUM = "Scores/scoresMedium.txt";
+    private String SCORES_HARD = "Scores/scoresHard.txt";
 
     public static void main(String[] args) {
         Minesweeper minesweeper = new Minesweeper();
