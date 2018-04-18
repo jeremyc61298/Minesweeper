@@ -1,18 +1,24 @@
 package minesweeper;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.ImageIcon;
-
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Image;
 
-
+// Originally, this class HAS-A button. That is no longer so because of the overhead
+// that was occurring each time a gameboard was created.
 public class GridPanel extends JPanel {
     public GridPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createRaisedBevelBorder());
         setPreferredSize(new Dimension(25, 25));
+        // Bomb icon drawn by my wonderful wife, Courtney
         bomb = new ImageIcon(new ImageIcon("Images/mine.png").getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT));
     }
 
@@ -91,7 +97,6 @@ public class GridPanel extends JPanel {
                 pair.flags--;
             }
             setBackground(UIManager.getColor("Button.background"));
-
         }
     }
 
