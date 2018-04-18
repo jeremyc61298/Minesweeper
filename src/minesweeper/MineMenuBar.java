@@ -1,6 +1,8 @@
 package minesweeper;
 
-import java.awt.*;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Menu;
 
 public class MineMenuBar extends MenuBar {
 
@@ -20,64 +22,27 @@ public class MineMenuBar extends MenuBar {
     }
 
     private void initMenuBar() {
-
         add(game);
-    }
-
-    public Menu getGame() {
-        return game;
-    }
-
-    public void setGame(Menu game) {
-        this.game = game;
     }
 
     public MenuItem getHard() {
         return hard;
     }
 
-    public void setHard(MenuItem hard) {
-        this.hard = hard;
-    }
-
     public MenuItem getMedium() {
         return medium;
-    }
-
-    public void setMedium(MenuItem medium) {
-        this.medium = medium;
     }
 
     public MenuItem getShowBombs() {
         return showBombs;
     }
 
-    public void setShowBombs(MenuItem showBombs) {
-        this.showBombs = showBombs;
-    }
-
-    public Menu getStartOver() {
-        return startOver;
-    }
-
-    public void setStartOver(Menu startOver) {
-        this.startOver = startOver;
-    }
-
     public MenuItem getViewHighScores() {
         return viewHighScores;
     }
 
-    public void setViewHighScores(MenuItem viewHighScores) {
-        this.viewHighScores = viewHighScores;
-    }
-
     public MenuItem getEasy() {
         return easy;
-    }
-
-    public void setEasy(MenuItem easy) {
-        this.easy = easy;
     }
 
     private Menu game = new Menu("Game");

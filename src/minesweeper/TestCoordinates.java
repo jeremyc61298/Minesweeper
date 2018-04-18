@@ -4,6 +4,10 @@ import java.util.List;
 import java.awt.Point;
 import java.util.Stack;
 
+// This class is used as a helped class for the gameboard. It has 2
+// public functions, which test how many bombs are nearby each gridPanel
+// in a gameboard, and allows for the gameboard to open up all possible
+// gridPanels if the user clicks on one that is not near any bombs.
 public class TestCoordinates {
 
     public TestCoordinates(int maxrows, int maxcols, List<List<Integer>> numGrid) {

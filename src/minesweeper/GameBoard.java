@@ -1,23 +1,22 @@
 package minesweeper;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 public class GameBoard extends JPanel {
 
     public GameBoard(int difficulty) {
-        switch (difficulty) {
+        this.DIFFICULTY = difficulty;
+            switch (DIFFICULTY) {
             case 2:
                 ROWS = 20;
                 COLS = 20;
@@ -104,7 +103,7 @@ public class GameBoard extends JPanel {
     }
 
     private void createClickListeners() {
-        // Create mouse listeners for each button
+        // Create mouse listeners for each gridPanel
         grid.forEach((colList) -> {
             colList.forEach((gridPanel) -> {
                 gridPanel.addMouseListener(new MouseAdapter() {
@@ -114,11 +113,13 @@ public class GameBoard extends JPanel {
                             if (e.getButton() == MouseEvent.BUTTON1) {
                                 boolean isRed = gridPanel.gridBtnLeftClicked();
 
+                                // If the user clicked a panel touching no bombs
                                 if (!isRed && gridPanel.getNearbyBombs().getText().equals("0")) {
                                     TestCoordinates tc = new TestCoordinates(ROWS, COLS, numGrid, grid);
                                     tc.testForZeros(gridPanel);
                                 }
                                 else if (!isRed && gridPanel.getNearbyBombs().getText().equals("")) {
+                                    // The user has clicked a bomb
                                     endGame();
                                 }
                             }
@@ -140,6 +141,7 @@ public class GameBoard extends JPanel {
         });
     }
 
+    // This function allows the use of a bound property I defined to be listened to
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         addPropertyChangeListener(listener);
@@ -147,15 +149,14 @@ public class GameBoard extends JPanel {
 
     private void endGame() {
         // The user has finished the game.
-        // Disable the gameBoard
-
+        // Alert the user and disable the gameboard
         if (!didWin) {
             revealBombs();
             JOptionPane.showMessageDialog(null, "You lost. Nice try!",
                     "Game Over", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("Images/mine.png"));
         }
         else {
-            JOptionPane.showMessageDialog(null, "You won!",
+            JOptionPane.showMessageDialog(null, "You won!\nScore: " + totalTime + " seconds",
                     "Winner!", JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -163,8 +164,8 @@ public class GameBoard extends JPanel {
         setEnabled(false);
     }
 
-    // This recursive function was taken from the internet and modified
-    // Link:
+    // This recursive function will disable all the child components of the gameboard
+    // Link: https://coderanch.com/t/332174/java/Disabling-JPanel-components
     public void disableGameBoard(Container container) {
         Component[] components = container.getComponents();
             for (int i = 0; i < components.length; i++) {
@@ -177,7 +178,6 @@ public class GameBoard extends JPanel {
 
     private void recordTime() {
         setTotalTime((System.nanoTime() - startTime)/1000/1000/1000);
-        System.out.println(totalTime);
     }
 
     public void setDidWin(boolean didWin) {
@@ -190,6 +190,7 @@ public class GameBoard extends JPanel {
         });
     }
 
+    // This function fires a propertyChange event, making it a bound property
     public void setTotalTime(long time) {
         long oldTime = totalTime;
         totalTime = time;
@@ -200,16 +201,12 @@ public class GameBoard extends JPanel {
         return totalTime;
     }
 
-    private void printNumGrid() {
-        // Print the numGrid
-        numGrid.forEach((rowList) -> {
-            rowList.forEach((colItem) -> {
-                System.out.print(colItem);
-            });
-            System.out.println();
-        });
+    public int getDifficulty() {
+        return DIFFICULTY;
     }
 
+    // This class is used to correlate the bombs and flags variables,
+    // so they can both be modified and changed in my gridBtnRightClicked function
     public class Pair {
         public Pair(int bombs, int flags) {
             this.bombs = bombs;
@@ -222,6 +219,7 @@ public class GameBoard extends JPanel {
     private final int ROWS;
     private final int COLS;
     private final int BOMBS;
+    private final int DIFFICULTY;
     private int bombsFound = 0;
     private int flagsLaid = 0;
     private long startTime;
@@ -230,5 +228,5 @@ public class GameBoard extends JPanel {
     private List<Point> bombLocations = new ArrayList<>();
     private List<List<GridPanel>> grid = new ArrayList<>();
     private List<List<Integer>> numGrid = new ArrayList<>();
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
 }
